@@ -37,6 +37,8 @@ The resulting dataset has `r nrow(transit_df)` rows and `r ncol(transit_df)` col
 
 ### Distinct stations
 
+Distinct stations are defined by line and station name.
+
 ```{r distinct_stations}
 transit_df %>% 
   distinct(line, station_name) %>% 
@@ -59,6 +61,8 @@ There are 468 ADA compliant stations.
 
 ### Vending
 
+Calculate the numerator (allow entrance + no vending) and denominator (no vending) respectively, then calculate the proportion.
+
 ```{r vending}
 no_vending = 
   transit_df %>%
@@ -70,13 +74,15 @@ entry_no_vending =
   filter(vending == "NO", entry == TRUE) %>% 
   nrow()
 
-propo_vending = entry_no_vending/ no_vending
+propo_vending = entry_no_vending / no_vending
 ```
 
 There are `r propo_vending * 100`% of stations without vending allow entrance.
 
 
 ### Display routes
+
+The original variable type of `route1:route7` are character, yet `route8:route11` are numeric, so they cannot combine together. Therefore, I convert `route8:route11` to character first, then do `pivot_longer()`.
 
 ```{r routes}
 transit_tidy_df =
@@ -90,6 +96,8 @@ transit_tidy_df =
     values_to = "route_name",
     values_drop_na = TRUE)
 ```
+
+Answering questions:
 
 ```{r routes_question}
 transit_tidy_df %>% 
