@@ -120,6 +120,8 @@ There are 107 ADA compliant stations that serve the A train.
 
 ### Import and clean the data
 
+Steps: import dataset (claim the sheet and cell range) -> clean variable names -> do some mutating in need
+
 ```{r data_cleaning_2}
 mr_trash_df = 
   read_excel("HW2_data/202309 Trash Wheel Collection Data.xlsx", 
@@ -189,4 +191,4 @@ gwyn_cigarette =
 
 The total weight of trash collected by Professor Trash Wheel is `r prof_weight` tons.
 
-The total number of cigarette butts collected by Gwynnda in June of 2022 is `r gwyn_cigarette`.
+The total number of cigarette butts collected by Gwynnda in June of 2022 is `r format(gwyn_cigarette, scientific=FALSE)`.
