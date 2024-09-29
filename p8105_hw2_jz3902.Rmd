@@ -7,6 +7,7 @@ output: github_document
 
 ```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 ## Problem 1
@@ -17,7 +18,7 @@ The original dataset contains variables including: division, line, station name,
 
 Data cleaning steps: clean variable names -> select variables in interest -> convert the `entry` variable from character to a logical variable by `case_match()`.
 
-```{r data_cleaning, message = FALSE}
+```{r data_cleaning_1, message = FALSE}
 transit_df = 
   read_csv("HW2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
@@ -115,5 +116,77 @@ There are 60 distinct stations serve the A train.
 There are 107 ADA compliant stations that serve the A train.
 
 
+## Problem 2
 
+### Import and clean the data
 
+```{r data_cleaning_2}
+mr_trash_df = 
+  read_excel("HW2_data/202309 Trash Wheel Collection Data.xlsx", 
+             sheet = "Mr. Trash Wheel",
+             range = "A2:N586") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    sports_balls = round(sports_balls),
+    sports_balls = as.integer(sports_balls),
+    type = "mr_trash",
+    year = as.numeric(year)
+  )
+
+professor_trash_df = 
+  read_excel("HW2_data/202309 Trash Wheel Collection Data.xlsx", 
+             sheet = "Professor Trash Wheel",
+             range = "A2:M108") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    type = "professor_trash"
+  )
+
+gwynnda_trash_df = 
+  read_excel("HW2_data/202309 Trash Wheel Collection Data.xlsx", 
+             sheet = "Gwynnda Trash Wheel",
+             range = "A2:L157") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    type = "gwynnda_trash"
+  )
+
+```
+
+### Combine datasets
+
+```{r trash_combining}
+trash_df = 
+  bind_rows(mr_trash_df, professor_trash_df, gwynnda_trash_df) %>% 
+  relocate(type)
+```
+
+There are `r nrow(trash_df)` observations and `r ncol(trash_df)` columns in the resulting dataset. Here are the first few lines of the dataset to show key variables:
+
+```{r trash_key_var}
+trash_df %>% 
+  head() %>% 
+  knitr::kable()
+```
+
+Answering questions:
+
+```{r trash_question}
+prof_weight = 
+  trash_df %>% 
+  filter(type == "professor_trash") %>% 
+  pull(weight_tons) %>% 
+  sum()
+
+gwyn_cigarette = 
+  trash_df %>% 
+  filter(type == "gwynnda_trash",
+         year == 2022,
+         month == "June") %>% 
+  pull(cigarette_butts) %>% 
+  sum()
+```
+
+The total weight of trash collected by Professor Trash Wheel is `r prof_weight` tons.
+
+The total number of cigarette butts collected by Gwynnda in June of 2022 is `r gwyn_cigarette`.
