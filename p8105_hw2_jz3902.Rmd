@@ -192,3 +192,58 @@ gwyn_cigarette =
 The total weight of trash collected by Professor Trash Wheel is `r prof_weight` tons.
 
 The total number of cigarette butts collected by Gwynnda in June of 2022 is `r format(gwyn_cigarette, scientific=FALSE)`.
+
+
+## Problem 3
+
+### Organize bakers datasets
+
+```{r baker}
+bakers_df = 
+  read_csv("HW2_data/gbb_datasets/bakers.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    baker_first_name = sub(" .*", "", baker_name)
+    )
+
+bakes_df = 
+  read_csv("HW2_data/gbb_datasets/bakes.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    baker = ifelse(baker == "\"Jo\"", "Jo", baker)
+    )
+
+
+results_df = 
+  read_csv("HW2_data/gbb_datasets/results.csv",
+           skip = 2) %>% 
+  janitor::clean_names()
+```
+
+Data cleaning steps: import dataset -> clean variable names -> wrangle each of datasets
+
+`bakers_df`: 
+
+* Pick up the bakers' first name to match the other datasets
+
+`bakes_df`:
+
+* For the baker named `"Jo"`, convert the name into `Jo` to match the other datasets
+
+`results_df`:
+
+* Skip some lines which not contain observations
+
+
+### Winners
+
+
+
+
+
+### Viewers
+
+
+
+
+
