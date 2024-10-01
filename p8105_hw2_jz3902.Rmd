@@ -42,8 +42,7 @@ Distinct stations are defined by line and station name.
 
 ```{r distinct_stations}
 transit_df %>% 
-  distinct(line, station_name) %>% 
-  nrow()
+  distinct(line, station_name)
 ```
 
 There are 465 distinct stations.
@@ -54,10 +53,10 @@ There are 465 distinct stations.
 ```{r ada_compliant}
 transit_df %>%
   filter(ada == TRUE) %>% 
-  nrow()
+  distinct(line, station_name)
 ```
 
-There are 468 ADA compliant stations.
+There are 84 ADA compliant stations.
 
 
 ### Vending
@@ -103,17 +102,16 @@ Answering questions:
 ```{r routes_question}
 transit_tidy_df %>% 
   filter(route_name == "A") %>% 
-  distinct(line, station_name) %>% 
-  nrow()
+  distinct(line, station_name)
 
 transit_tidy_df %>% 
   filter(route_name == "A", ada == TRUE) %>% 
-  nrow()
+  distinct(line, station_name)
 ```
 
 There are 60 distinct stations serve the A train.
 
-There are 107 ADA compliant stations that serve the A train.
+There are 17 ADA compliant stations that serve the A train.
 
 
 ## Problem 2
@@ -196,9 +194,9 @@ The total number of cigarette butts collected by Gwynnda in June of 2022 is `r f
 
 ## Problem 3
 
-### Organize bakers datasets
+### Import and clean the data
 
-```{r baker}
+```{r data_cleaning_3, message = FALSE}
 bakers_df = 
   read_csv("HW2_data/gbb_datasets/bakers.csv") %>% 
   janitor::clean_names() %>% 
@@ -207,32 +205,97 @@ bakers_df =
     )
 
 bakes_df = 
-  read_csv("HW2_data/gbb_datasets/bakes.csv") %>% 
+  read_csv("HW2_data/gbb_datasets/bakes.csv", 
+           na = c("NA", "N/A", "UNKNOWN", "Unknown", "")) %>% 
   janitor::clean_names() %>% 
   mutate(
     baker = ifelse(baker == "\"Jo\"", "Jo", baker)
-    )
+    ) %>% 
+  rename(baker_first_name = baker) %>% 
+  arrange(baker_first_name)
 
 
 results_df = 
   read_csv("HW2_data/gbb_datasets/results.csv",
            skip = 2) %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  rename(baker_first_name = baker) %>% 
+  arrange(baker_first_name) %>% 
+  drop_na(result)
 ```
 
 Data cleaning steps: import dataset -> clean variable names -> wrangle each of datasets
 
 `bakers_df`: 
 
-* Pick up the bakers' first name to match the other datasets
+* Pick up the baker's first name to match the other datasets
 
 `bakes_df`:
 
+* Unknown values are uniformly recorded as NA
+
 * For the baker named `"Jo"`, convert the name into `Jo` to match the other datasets
+
+* Rename variable `baker` to `baker_first_name`, to match the first dataset `bakers_df`
+
+* Sort baker's name alphabetically
 
 `results_df`:
 
 * Skip some lines which not contain observations
+
+* Rename variable `baker` to `baker_first_name`, to match the first dataset `bakers_df`
+
+* Sort baker's name alphabetically
+
+* By looking at the dataset, we can see that the eliminated bakers have NA in `result` after they are OUT, which means they will no longer participate in the competition. Therefore, NA in `result` should be dropped.
+
+### Organize bakers datasets
+
+```{r baker_organizing}
+baker_bake_df = 
+  left_join(
+    bakers_df, 
+    bakes_df, 
+    join_by(baker_first_name, series)
+  )
+
+baker_organized_df = 
+  full_join(
+    baker_bake_df,
+    results_df,
+    join_by(baker_first_name, series, episode)
+  ) %>% 
+  group_by(baker_first_name, series) %>% 
+  fill(baker_name:hometown) %>% 
+  ungroup() %>% 
+  arrange(baker_name)
+```
+
+
+
+
+### Check across datasets
+
+```{r baker_checking}
+anti_join(
+  results_df,
+  baker_organized_df,
+    join_by(baker_first_name, series)
+  )
+
+anti_join(
+  bakers_df,
+  baker_organized_df,
+    join_by(baker_first_name, series)
+  )
+
+anti_join(
+  bakes_df,
+  baker_organized_df,
+    join_by(baker_first_name, series)
+  )
+```
 
 
 ### Winners
