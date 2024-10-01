@@ -397,11 +397,37 @@ To get a deeper understanding of the table, I arranged the table by baker’s na
 
 ### Viewers
 
-```{r}
+```{r viewers, message = FALSE}
 viewers_df = 
-  read_csv("HW2_data/gbb_datasets/viewers.csv")
+  read_csv("HW2_data/gbb_datasets/viewers.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    cols = series_1:series_10,
+    names_to = "series",
+    values_to = "viewership",
+    names_prefix = "series_"
+  ) %>% 
+  mutate(
+    series = as.numeric(series)
+  ) %>% 
+  relocate(series) %>% 
+  arrange(series)
+
+head(viewers_df, 10)
+
+viewers_df %>% 
+  filter(series == 1) %>% 
+  pull(viewership) %>% 
+  mean(, na.rm = TRUE)
+
+viewers_df %>% 
+  filter(series == 5) %>% 
+  pull(viewership) %>% 
+  mean(, na.rm = TRUE)
 ```
 
+The average viewership in Season 1: 2.77
 
+The average viewership in Season 5: 10.0393
 
 
