@@ -269,21 +269,22 @@ baker_organized_df =
   group_by(baker_first_name, series) %>% 
   fill(baker_name:hometown) %>% 
   ungroup() %>% 
-  arrange(baker_name)
+  arrange(baker_name) %>% 
+  drop_na(episode)
 ```
 
+1. Join `bakers.csv` and `bakes.csv` first, by baker's first name + series. The result is **the bakers+bakes dataset**.
 
+2. Join **the bakers+bakes dataset** with `results.csv`, by baker's first name + series + episode.
+
+3. By looking at the dataset, we can see some bakers only have episode information in `results.csv`, so the rows cannot match with those in **the bakers+bakes dataset** (where episode information is NA). To fix this, I fill those NAs with `group_by()` and `fill()`, then remove the grouping after the operation. 
+
+4. Next, sort baker's name alphabetically, and drop the rows that have NA in `episode`. (Explanation: These rows are used as reference to fill in *step 3*, and only have the information from **the bakers+bakes dataset** but not from `results.csv`. Therefore, these rows can be dropped after **the bakers+bakes dataset** information is filled.)
 
 
 ### Check across datasets
 
 ```{r baker_checking}
-anti_join(
-  results_df,
-  baker_organized_df,
-    join_by(baker_first_name, series)
-  )
-
 anti_join(
   bakers_df,
   baker_organized_df,
@@ -293,10 +294,31 @@ anti_join(
 anti_join(
   bakes_df,
   baker_organized_df,
-    join_by(baker_first_name, series)
+    join_by(baker_first_name, series, episode)
+  )
+
+anti_join(
+  results_df,
+  baker_organized_df,
+    join_by(baker_first_name, series, episode)
   )
 ```
 
+Check for completeness and correctness across datasets. View the three datasets respectively.
+
+### Resulting dataset
+
+```{r baker_resulting}
+baker_result_df = 
+baker_organized_df %>% 
+  select(baker_name, baker_age, baker_occupation, hometown, series, episode, technical, result, signature_bake, show_stopper)
+```
+
+1. Organize the dataset in a meaningful order. 
+
+* Variables: baker's name -> baker's basic information (age, occupation, hometown) -> series and episode involved ->  competition technical and result -> signature bake and show stopper
+
+* Observations: Alphabetical order of baker's name
 
 ### Winners
 
