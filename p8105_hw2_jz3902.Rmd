@@ -122,9 +122,9 @@ Steps: import dataset (claim the sheet and cell range) -> clean variable names -
 
 ```{r data_cleaning_2}
 mr_trash_df = 
-  read_excel("HW2_data/202309 Trash Wheel Collection Data.xlsx", 
+  read_excel("HW2_data/202409 Trash Wheel Collection Data.xlsx", 
              sheet = "Mr. Trash Wheel",
-             range = "A2:N586") %>% 
+             range = "A2:N653") %>% 
   janitor::clean_names() %>% 
   mutate(
     sports_balls = round(sports_balls),
@@ -134,18 +134,18 @@ mr_trash_df =
   )
 
 professor_trash_df = 
-  read_excel("HW2_data/202309 Trash Wheel Collection Data.xlsx", 
+  read_excel("HW2_data/202409 Trash Wheel Collection Data.xlsx", 
              sheet = "Professor Trash Wheel",
-             range = "A2:M108") %>% 
+             range = "A2:M120") %>% 
   janitor::clean_names() %>% 
   mutate(
     type = "professor_trash"
   )
 
 gwynnda_trash_df = 
-  read_excel("HW2_data/202309 Trash Wheel Collection Data.xlsx", 
+  read_excel("HW2_data/202409 Trash Wheel Collection Data.xlsx", 
              sheet = "Gwynnda Trash Wheel",
-             range = "A2:L157") %>% 
+             range = "A2:L265") %>% 
   janitor::clean_names() %>% 
   mutate(
     type = "gwynnda_trash"
