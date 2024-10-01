@@ -159,15 +159,11 @@ gwynnda_trash_df =
 trash_df = 
   bind_rows(mr_trash_df, professor_trash_df, gwynnda_trash_df) %>% 
   relocate(type)
+
+trash_df
 ```
 
-There are `r nrow(trash_df)` observations and `r ncol(trash_df)` columns in the resulting dataset. Here are the first few lines of the dataset to show key variables:
-
-```{r trash_key_var}
-trash_df %>% 
-  head() %>% 
-  knitr::kable()
-```
+There are `r nrow(trash_df)` observations and `r ncol(trash_df)` columns in the resulting dataset. Here are the first few lines of the dataset to show key variables.
 
 Answering questions:
 
