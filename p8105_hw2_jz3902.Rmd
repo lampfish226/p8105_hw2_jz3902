@@ -309,13 +309,13 @@ Check for completeness and correctness across datasets. View the three datasets 
 ### Resulting dataset
 
 ```{r baker_resulting}
-baker_result_df = 
+baker_final_df = 
 baker_organized_df %>% 
   select(baker_first_name, baker_name, baker_age, baker_occupation, hometown, series, episode, technical, result, signature_bake, show_stopper) %>% 
   rename(baker_full_name = baker_name)
 
-baker_result_df %>% 
-write_csv("HW2_data/gbb_datasets/baker_result_df.csv")
+baker_final_df %>% 
+write_csv("HW2_data/gbb_datasets/baker_final_df.csv")
 ```
 
 1. Organize the dataset in a meaningful order and name variables properly.
@@ -329,16 +329,16 @@ write_csv("HW2_data/gbb_datasets/baker_result_df.csv")
 3. Brief discussion
 
 ```{r}
-baker_result_df
+baker_final_df
 ```
 
-* There are `r nrow(baker_result_df)` rows and `r ncol(baker_result_df)` columns in the final dataset. The dataset shows information of the bakers, their bakes and their performance.
+* There are `r nrow(baker_final_df)` rows and `r ncol(baker_final_df)` columns in the final dataset. The dataset shows information of the bakers, their bakes and their performance.
 
 
 ### Winners
 
 ```{r baker_winner}
-baker_result_df %>% 
+baker_final_df %>% 
   select(series, result, baker_first_name) %>% 
   filter(series >= 5, series <= 10,
          result %in% c("WINNER", "STAR BAKER")) %>%
@@ -377,7 +377,7 @@ Steps:
 ### Comments on winners
 
 ```{r baker_winner_predict}
-baker_result_df %>% 
+baker_final_df %>% 
   select(series, result, baker_first_name) %>% 
   filter(series >= 5, series <= 10,
          result %in% c("WINNER", "STAR BAKER")) %>%
@@ -397,6 +397,10 @@ To get a deeper understanding of the table, I arranged the table by baker’s na
 
 ### Viewers
 
+```{r}
+viewers_df = 
+  read_csv("HW2_data/gbb_datasets/viewers.csv")
+```
 
 
 
