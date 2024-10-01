@@ -269,7 +269,7 @@ baker_organized_df =
   group_by(baker_first_name, series) %>% 
   fill(baker_name:hometown) %>% 
   ungroup() %>% 
-  arrange(baker_name) %>% 
+  arrange(baker_first_name) %>% 
   drop_na(episode)
 ```
 
@@ -279,7 +279,7 @@ baker_organized_df =
 
 3. By looking at the dataset, we can see some bakers only have episode information in `results.csv`, so the rows cannot match with those in **the bakers+bakes dataset** (where episode information is NA). To fix this, I fill those NAs with `group_by()` and `fill()`, then remove the grouping after the operation. 
 
-4. Next, sort baker's name alphabetically, and drop the rows that have NA in `episode`. (Explanation: These rows are used as reference to fill in *step 3*, and only have the information from **the bakers+bakes dataset** but not from `results.csv`. Therefore, these rows can be dropped after **the bakers+bakes dataset** information is filled.)
+4. Next, sort baker's first name alphabetically, and drop the rows that have NA in `episode`. (Explanation: These rows are used as reference to fill in *step 3*, and only have the information from **the bakers+bakes dataset** but not from `results.csv`. Therefore, these rows can be dropped after **the bakers+bakes dataset** information is filled.)
 
 
 ### Check across datasets
@@ -311,19 +311,88 @@ Check for completeness and correctness across datasets. View the three datasets 
 ```{r baker_resulting}
 baker_result_df = 
 baker_organized_df %>% 
-  select(baker_name, baker_age, baker_occupation, hometown, series, episode, technical, result, signature_bake, show_stopper)
+  select(baker_first_name, baker_name, baker_age, baker_occupation, hometown, series, episode, technical, result, signature_bake, show_stopper) %>% 
+  rename(baker_full_name = baker_name)
+
+baker_result_df %>% 
+write_csv("HW2_data/gbb_datasets/baker_result_df.csv")
 ```
 
-1. Organize the dataset in a meaningful order. 
+1. Organize the dataset in a meaningful order and name variables properly.
 
-* Variables: baker's name -> baker's basic information (age, occupation, hometown) -> series and episode involved ->  competition technical and result -> signature bake and show stopper
+* Variables: baker's first name and full name -> baker's basic information (age, occupation, hometown) -> series and episode involved ->  competition technical and result -> signature bake and show stopper
 
-* Observations: Alphabetical order of baker's name
+* Observations: Alphabetical order of baker's first name
+
+2. Export the result as a CSV
+
+3. Brief discussion
+
+```{r}
+baker_result_df
+```
+
+* There are `r nrow(baker_result_df)` rows and `r ncol(baker_result_df)` columns in the final dataset. The dataset shows information of the bakers, their bakes and their performance.
+
 
 ### Winners
 
+```{r baker_winner}
+baker_result_df %>% 
+  select(series, result, baker_first_name) %>% 
+  filter(series >= 5, series <= 10,
+         result %in% c("WINNER", "STAR BAKER")) %>%
+  mutate(
+    result = case_match(
+      result,
+      "WINNER" ~ "Winner",
+      "STAR BAKER" ~ "Star Baker"
+    )
+  ) %>% 
+  arrange(series, result) %>% 
+  distinct() %>% 
+  pivot_wider(
+    names_from = result,
+    values_from = baker_first_name,
+    values_fn = list
+  ) %>% 
+  rename(Series = series) %>% 
+  knitr::kable()
+```
 
+**The star baker and winner of each episode in Seasons 5 through 10**
 
+Steps:
+
+1. Select columns and filter rows in interest
+
+2. Sort by series and baker's first name
+
+3. Obtain all the unique lines
+
+4. Organize variable names
+
+5. Generate a reader-friendly table
+
+### Comments on winners
+
+```{r baker_winner_predict}
+baker_result_df %>% 
+  select(series, result, baker_first_name) %>% 
+  filter(series >= 5, series <= 10,
+         result %in% c("WINNER", "STAR BAKER")) %>%
+  arrange(baker_first_name) %>% 
+  distinct() %>% 
+  knitr::kable()
+```
+
+To get a deeper understanding of the table, I arranged the table by baker’s name to see how each person performed.
+
+* Most of them got STAR BAKER once, and a few of STAR BAKER also got WINNER.
+
+* What surprise me is that David, the WINNER of season 10, only got WINNER but not STAR BAKER. Furthermore, Kate got STAR BAKER twice but didn't get WINNER in both seasons. 
+
+* Based on these situations, I think there are many factors that determine the overall winner, and we can't simply judge from the results.
 
 
 ### Viewers
